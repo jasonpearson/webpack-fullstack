@@ -1,0 +1,26 @@
+{
+  "name": "webpack-fullstack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "bin": {
+    "webpack-fullstack": "./dist/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "./node_modules/.bin/webpack --watch",
+    "build": "./node_modules/.bin/webpack"
+  },
+  "keywords": [],
+  "author": "Jason Pearson <thejasonpearson@gmail.com> (jasonpearson.me)",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^7.0.5",
+    "eslint": "^3.17.0",
+    "eslint-loader": "^1.6.3",
+    "ts-loader": "^2.0.1",
+    "typescript": "^2.2.1",
+    "typescript-eslint-parser": "^2.0.0",
+    "webpack": "^2.2.1"
+  }
+}
