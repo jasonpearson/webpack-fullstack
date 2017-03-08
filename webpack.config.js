@@ -8,18 +8,26 @@ fs.readdirSync('node_modules')
   .forEach( (mod) => externals[mod] = 'commonjs ' + mod );
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    index: './src/index.ts',
+    vm: './src/vm.js'
+  },
 
   output: {
     path: './dist',
-    filename: 'index.js'
+    filename: '[name].js'
   },
 
   target: 'node',
 
   node: {
+    console: true,
+    global: true,
     process: true,
-    path: true
+    Buffer: true,
+    __filename: "mock",
+    __dirname: "mock",
+    setImmediate: true
   },
 
   externals,
