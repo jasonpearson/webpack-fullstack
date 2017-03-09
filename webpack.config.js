@@ -1,5 +1,6 @@
 const fs = require('fs');
 const webpack = require('webpack');
+const path = require('path');
 
 var externals = {};
 
@@ -9,12 +10,12 @@ fs.readdirSync('node_modules')
 
 module.exports = {
   entry: {
-    index: './src/index.ts',
-    vm: './src/vm.js'
+    'webpack-fullstack': './src/index.ts',
+    'vm': './src/vm.js'
   },
 
   output: {
-    path: './dist',
+    path: path.resolve(__dirname, './dist'),
     filename: '[name].js'
   },
 
@@ -25,8 +26,8 @@ module.exports = {
     global: true,
     process: true,
     Buffer: true,
-    __filename: "mock",
-    __dirname: "mock",
+    __filename: true,
+    __dirname: true,
     setImmediate: true
   },
 

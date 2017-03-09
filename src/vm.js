@@ -10,7 +10,3 @@ const vm = new NodeVM({
 });
 
 vm.run(process.argv[2], process.argv[3]);
-
-// console.log(process.argv[3])
-
-// './src/server/server.bundle.ts'

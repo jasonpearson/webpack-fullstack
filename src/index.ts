@@ -20,6 +20,12 @@ const compiler = webpack( config.server );
 const mfs = new MemoryFS();
 compiler.outputFileSystem = mfs;
 
+fs.writeFile(
+  path.resolve(devDir, 'node_modules/webpack-fullstack/dist/index.js'),
+  `module.exports = ${JSON.stringify(config.client)}`,
+  () => console.log('created client config')
+);
+
 let child;
 
 

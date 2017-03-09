@@ -9,13 +9,13 @@ var serverDefaults = {
     __dirname: true
   },
   externals : {},
-  plugins: [
-    // new webpack.BannerPlugin({
-    //   banner: 'require("source-map-support").install();',
-    //   raw: true,
-    //   entryOnly: false
-    // })
-  ]
+  // plugins: [
+  //   new webpack.BannerPlugin({
+  //     banner: 'require("source-map-support").install();',
+  //     raw: true,
+  //     entryOnly: false
+  //   }),
+  // ]
 };
 
 var clientDefaults = {

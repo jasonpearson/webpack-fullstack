@@ -1,24 +1,28 @@
 {
   "name": "webpack-fullstack",
   "version": "1.0.0",
+  "keywords": [],
+  "author": "Jason Pearson <thejasonpearson@gmail.com> (jasonpearson.me)",
+  "license": "ISC",
   "description": "",
   "main": "./dist/index.js",
   "bin": {
-    "webpack-fullstack": "./dist/index.js"
+    "webpack-fullstack": "./dist/webpack-fullstack.js"
   },
   "scripts": {
+    "clean": "rm -rf ./node_modules && npm cache clear",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "./node_modules/.bin/webpack --watch",
     "build": "./node_modules/.bin/webpack"
   },
-  "keywords": [],
-  "author": "Jason Pearson <thejasonpearson@gmail.com> (jasonpearson.me)",
-  "license": "ISC",
   "types": "./src/index.d.ts",
   "devDependencies": {
     "@types/node": "^7.0.5",
     "@types/webpack": "^2.2.7",
+    "eslint": "^3.17.1",
+    "eslint-loader": "^1.6.3",
     "source-map-support": "^0.4.11",
+    "ts-loader": "^2.0.1",
     "typescript": "^2.2.1",
     "typescript-eslint-parser": "^2.0.0",
     "webpack": "^2.2.1"
@@ -29,9 +33,5 @@
     "path": "^0.12.7",
     "vm2": "^3.2.0",
     "webpack": "^2.2.1"
-  },
-  "peerDependencies": {
-    "webpack": "^2.2.0",
-    "webpack-dev-server": "^2.2.0"
   }
 }
