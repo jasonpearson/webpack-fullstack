@@ -22,7 +22,13 @@ compiler.outputFileSystem = mfs;
 
 fs.writeFile(
   path.resolve(devDir, 'node_modules/webpack-fullstack/dist/index.js'),
-  `module.exports = ${JSON.stringify(config.client)}`,
+  `
+    const configAsString = '${JSON.stringify(config.client, (key, val) =>
+      val instanceof RegExp ? '_PxEgEr_' + val.toString().slice(2) : val )}';
+
+    module.exports = JSON.parse(configAsString, (key, val) =>
+      typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '${String.raw`\\`}' + val.slice(8, -1)) : val);
+  `,
   () => console.log('created client config')
 );
 

@@ -71,10 +71,16 @@
 /* 0 */
 /***/ (function(module, exports) {
 
-module.exports = require("path");
+module.exports = require("fs");
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -88,8 +94,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     return t;
 };
 exports.__esModule = true;
-var fs = __webpack_require__(6);
-var path = __webpack_require__(0);
+var fs = __webpack_require__(0);
+var path = __webpack_require__(1);
 var serverDefaults = {
     target: 'node',
     node: {
@@ -122,29 +128,23 @@ exports["default"] = processConfig;
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 module.exports = require("child_process");
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = require("memory-fs");
 
 /***/ }),
-/* 4 */,
-/* 5 */
-/***/ (function(module, exports) {
-
-module.exports = require("webpack");
-
-/***/ }),
+/* 5 */,
 /* 6 */
 /***/ (function(module, exports) {
 
-module.exports = require("fs");
+module.exports = require("webpack");
 
 /***/ }),
 /* 7 */
@@ -154,12 +154,12 @@ module.exports = require("fs");
 /// <reference path="./index.d.ts" />
 
 exports.__esModule = true;
-var path = __webpack_require__(0);
-var fs = __webpack_require__(6);
-var webpack = __webpack_require__(5);
-var MemoryFS = __webpack_require__(3);
-var childProcess = __webpack_require__(2);
-var process_config_1 = __webpack_require__(1);
+var path = __webpack_require__(1);
+var fs = __webpack_require__(0);
+var webpack = __webpack_require__(6);
+var MemoryFS = __webpack_require__(4);
+var childProcess = __webpack_require__(3);
+var process_config_1 = __webpack_require__(2);
 var devDir = path.resolve(process.cwd());
 var preConfigPath = path.join(devDir, 'webpack.fullstack.js');
 var preConfig = require(preConfigPath);
@@ -167,7 +167,10 @@ var config = process_config_1["default"](preConfig, devDir);
 var compiler = webpack(config.server);
 var mfs = new MemoryFS();
 compiler.outputFileSystem = mfs;
-fs.writeFile(path.resolve(devDir, 'node_modules/webpack-fullstack/dist/index.js'), "module.exports = " + JSON.stringify(config.client), function () { return console.log('created client config'); });
+var rawString = (_a = ["\\"], _a.raw = ["\\\\"], String.raw(_a));
+fs.writeFile(path.resolve(devDir, 'node_modules/webpack-fullstack/dist/index.js'), "\n    const configAsString = '" + JSON.stringify(config.client, function (key, val) {
+    return val instanceof RegExp ? '_PxEgEr_' + val.toString().slice(2) : val;
+}) + "';\n\n    module.exports = JSON.parse(configAsString, (key, val) =>\n      typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '" + (_b = ["\\"], _b.raw = ["\\\\"], String.raw(_b)) + "' + val.slice(8, -1)) : val);\n  ", function () { return console.log('created client config'); });
 var child;
 compiler.watch(null, function startAppServer(err, stats) {
     if (err) {
@@ -197,6 +200,7 @@ compiler.watch(null, function startAppServer(err, stats) {
         console.log("Child exited with code " + code);
     });
 });
+var _a, _b;
 
 
 /***/ })

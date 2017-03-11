@@ -69,7 +69,7 @@
 /************************************************************************/
 /******/ ({
 
-/***/ 4:
+/***/ 5:
 /***/ (function(module, exports) {
 
 module.exports = require("vm2");
@@ -79,7 +79,7 @@ module.exports = require("vm2");
 /***/ 8:
 /***/ (function(module, exports, __webpack_require__) {
 
-const {NodeVM} = __webpack_require__(4);
+const {NodeVM} = __webpack_require__(5);
 
 console.log('NEW VM');
 
