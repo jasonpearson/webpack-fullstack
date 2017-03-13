@@ -37,6 +37,8 @@ module.exports = {
     extensions: ['.js', '.ts']
   },
 
+  devtool: 'source-map',
+
   module: {
     rules: [
       {
@@ -52,6 +54,12 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.BannerPlugin({
+      banner: 'require("source-map-support").install();',
+      raw: true,
+      entryOnly: false
+    }),
+        
     new webpack.BannerPlugin({
       banner: '#!/usr/bin/env node',
       raw: true,

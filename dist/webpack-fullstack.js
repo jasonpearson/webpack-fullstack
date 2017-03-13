@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require("source-map-support").install();
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -167,20 +168,22 @@ var config = process_config_1["default"](preConfig, devDir);
 var compiler = webpack(config.server);
 var mfs = new MemoryFS();
 compiler.outputFileSystem = mfs;
-var rawString = (_a = ["\\"], _a.raw = ["\\\\"], String.raw(_a));
 fs.writeFile(path.resolve(devDir, 'node_modules/webpack-fullstack/dist/index.js'), "\n    const configAsString = '" + JSON.stringify(config.client, function (key, val) {
     return val instanceof RegExp ? '_PxEgEr_' + val.toString().slice(2) : val;
-}) + "';\n\n    module.exports = JSON.parse(configAsString, (key, val) =>\n      typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '" + (_b = ["\\"], _b.raw = ["\\\\"], String.raw(_b)) + "' + val.slice(8, -1)) : val);\n  ", function () { return console.log('created client config'); });
+}) + "';\n\n    module.exports = JSON.parse(configAsString, (key, val) =>\n      typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '" + (_a = ["\\"], _a.raw = ["\\\\"], String.raw(_a)) + "' + val.slice(8, -1)) : val);\n  ", function () { return console.log('webpack client config created.'); });
 var child;
-compiler.watch(null, function startAppServer(err, stats) {
+console.log('webpack server is compiling and watching for changes...');
+compiler.watch({
+    ignored: devDir
+}, function startAppServer(err, stats) {
     if (err) {
-        // return console.log(err);
-        console.log('err');
+        console.log('webpack server failed.');
+        return console.log(err);
     }
+    console.log('webpack server compiled succesfully.');
     if (child) {
         child.kill();
     }
-    console.log('COMPILED');
     var serverScriptPath = stats.compilation.assets['server.bundle.js'].existsAt;
     var serverScript = mfs.readFileSync(serverScriptPath);
     var vmPath = path.resolve(devDir, 'node_modules/webpack-fullstack/dist/vm.js');
@@ -200,8 +203,9 @@ compiler.watch(null, function startAppServer(err, stats) {
         console.log("Child exited with code " + code);
     });
 });
-var _a, _b;
+var _a;
 
 
 /***/ })
 /******/ ]);
+//# sourceMappingURL=webpack-fullstack.js.map

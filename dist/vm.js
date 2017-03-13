@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require("source-map-support").install();
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -81,8 +82,6 @@ module.exports = require("vm2");
 
 const {NodeVM} = __webpack_require__(5);
 
-console.log('NEW VM');
-
 const vm = new NodeVM({
   require: {
     external: true,
@@ -96,3 +95,4 @@ vm.run(process.argv[2], process.argv[3]);
 /***/ })
 
 /******/ });
+//# sourceMappingURL=vm.js.map
