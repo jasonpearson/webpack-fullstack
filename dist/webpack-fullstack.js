@@ -82,6 +82,12 @@ module.exports = require("path");
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+module.exports = require("webpack");
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -97,12 +103,20 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 exports.__esModule = true;
 var fs = __webpack_require__(0);
 var path = __webpack_require__(1);
+var webpack = __webpack_require__(2);
 var serverDefaults = {
     target: 'node',
     node: {
         __dirname: true
     },
-    externals: {}
+    externals: {},
+    plugins: [
+        new webpack.BannerPlugin({
+            banner: 'require("source-map-support").install();',
+            raw: true,
+            entryOnly: true
+        })
+    ]
 };
 var clientDefaults = {};
 function processConfig(config, devDir) {
@@ -129,25 +143,19 @@ exports["default"] = processConfig;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = require("child_process");
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 module.exports = require("memory-fs");
 
 /***/ }),
-/* 5 */,
-/* 6 */
-/***/ (function(module, exports) {
-
-module.exports = require("webpack");
-
-/***/ }),
+/* 6 */,
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -157,10 +165,10 @@ module.exports = require("webpack");
 exports.__esModule = true;
 var path = __webpack_require__(1);
 var fs = __webpack_require__(0);
-var webpack = __webpack_require__(6);
-var MemoryFS = __webpack_require__(4);
-var childProcess = __webpack_require__(3);
-var process_config_1 = __webpack_require__(2);
+var webpack = __webpack_require__(2);
+var MemoryFS = __webpack_require__(5);
+var childProcess = __webpack_require__(4);
+var process_config_1 = __webpack_require__(3);
 var devDir = path.resolve(process.cwd());
 var preConfigPath = path.join(devDir, 'webpack.fullstack.js');
 var preConfig = require(preConfigPath);
@@ -168,13 +176,14 @@ var config = process_config_1["default"](preConfig, devDir);
 var compiler = webpack(config.server);
 var mfs = new MemoryFS();
 compiler.outputFileSystem = mfs;
-fs.writeFile(path.resolve(devDir, 'node_modules/webpack-fullstack/dist/index.js'), "\n    const configAsString = '" + JSON.stringify(config.client, function (key, val) {
+fs.writeFile(path.resolve(devDir, 'node_modules/webpack-fullstack/dist/webpack.client.config.js'), "\n    const configAsString = '" + JSON.stringify(config.client, function (key, val) {
     return val instanceof RegExp ? '_PxEgEr_' + val.toString().slice(2) : val;
 }) + "';\n\n    module.exports = JSON.parse(configAsString, (key, val) =>\n      typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '" + (_a = ["\\"], _a.raw = ["\\\\"], String.raw(_a)) + "' + val.slice(8, -1)) : val);\n  ", function () { return console.log('webpack client config created.'); });
 var child;
 console.log('webpack server is compiling and watching for changes...');
+console.log(preConfig.client.entry.slice(0, preConfig.client.entry.lastIndexOf('/')));
 compiler.watch({
-    ignored: devDir
+    ignored: preConfig.client.entry.slice(0, preConfig.client.entry.lastIndexOf('/'))
 }, function startAppServer(err, stats) {
     if (err) {
         console.log('webpack server failed.');

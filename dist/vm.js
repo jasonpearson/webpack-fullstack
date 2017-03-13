@@ -70,7 +70,7 @@ require("source-map-support").install();
 /************************************************************************/
 /******/ ({
 
-/***/ 5:
+/***/ 6:
 /***/ (function(module, exports) {
 
 module.exports = require("vm2");
@@ -80,7 +80,7 @@ module.exports = require("vm2");
 /***/ 8:
 /***/ (function(module, exports, __webpack_require__) {
 
-const {NodeVM} = __webpack_require__(5);
+const {NodeVM} = __webpack_require__(6);
 
 const vm = new NodeVM({
   require: {

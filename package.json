@@ -1,11 +1,17 @@
 {
   "name": "webpack-fullstack",
   "version": "1.0.0",
-  "keywords": [],
+  "keywords": [
+    "webpack",
+    "fullstack",
+    "server",
+    "config",
+    "configuration"
+  ],
   "author": "Jason Pearson <thejasonpearson@gmail.com> (jasonpearson.me)",
   "license": "ISC",
-  "description": "",
-  "main": "./dist/index.js",
+  "description": "Webpack configuration helper and command line tool that simplifies the use of webpack on the client and server",
+  "main": "./dist/webpack.client.config.js",
   "bin": {
     "webpack-fullstack": "./dist/webpack-fullstack.js"
   },

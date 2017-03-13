@@ -21,7 +21,7 @@ const mfs = new MemoryFS();
 compiler.outputFileSystem = mfs;
 
 fs.writeFile(
-  path.resolve(devDir, 'node_modules/webpack-fullstack/dist/index.js'),
+  path.resolve(devDir, 'node_modules/webpack-fullstack/dist/webpack.client.config.js'),
   `
     const configAsString = '${JSON.stringify(config.client, (key, val) =>
       val instanceof RegExp ? '_PxEgEr_' + val.toString().slice(2) : val )}';
@@ -36,8 +36,10 @@ let child;
 
 console.log('webpack server is compiling and watching for changes...');
 
+console.log(preConfig.client.entry.slice( 0, preConfig.client.entry.lastIndexOf('/')));
+
 compiler.watch({
-  ignored: devDir
+  ignored: preConfig.client.entry.slice( 0, preConfig.client.entry.lastIndexOf('/') )
 }, function startAppServer( err, stats: any ) {
   if (err) {
     console.log('webpack server failed.');
