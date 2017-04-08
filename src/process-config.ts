@@ -32,13 +32,14 @@ function processConfig(
     .forEach( (m) => serverDefaults.externals[m] = 'commonjs ' + m );
 
   serverDefaults.externals['react-dom/server'] = 'commonjs react-dom/server';
+  serverDefaults.externals['history/createBrowserHistory'] = 'commonjs history/createBrowserHistory';
 
   for (let key in config) {
     if (key === 'server') {
       config.server = {
         ...serverDefaults,
         ...config.server,
-        devtool: 'inline-source-map'
+        devtool: 'source-map'
       };
 
     } else if (key === 'client') {

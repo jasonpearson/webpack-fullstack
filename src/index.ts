@@ -5,41 +5,43 @@ import * as fs from 'fs';
 import * as webpack from 'webpack';
 import * as MemoryFS from 'memory-fs';
 import * as childProcess from 'child_process';
-
 import {WFSConfigInterface} from './index.d';
 import processConfig from './process-config';
 
 declare const __non_webpack_require__: (path: string) => any;
-
+const dev = process.argv[2] === '--dev' ? true : false;
 const devDir = path.resolve( process.cwd() );
-const preConfigPath = path.join( devDir, 'webpack.fullstack.js' );
-const preConfig = __non_webpack_require__( preConfigPath );
-const config = processConfig( preConfig, devDir );
-
-const compiler = webpack( config.server );
+const fullstackConfigPath = path.join( devDir, 'webpack.fullstack.js' );
+const fullstackConfig = __non_webpack_require__( fullstackConfigPath );
+const config = processConfig( fullstackConfig, devDir );
+const serverCompiler = webpack( config.server );
 const mfs = new MemoryFS();
-compiler.outputFileSystem = mfs;
+
+if (dev) {
+  serverCompiler.outputFileSystem = mfs;
+}
 
 fs.writeFile(
   path.resolve(devDir, 'node_modules/webpack-fullstack/dist/webpack.client.config.js'),
   `
+    // encode regex values as strings
     const configAsString = '${JSON.stringify(config.client, (key, val) =>
       val instanceof RegExp ? '_PxEgEr_' + val.toString().slice(2) : val )}';
 
+    // decode strings into regex values
     module.exports = JSON.parse(configAsString, (key, val) =>
       typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '${String.raw`\\`}' + val.slice(8, -1)) : val);
   `,
   () => console.log('webpack client config created.')
 );
 
-let child;
+let serverProcess;
 
 console.log('webpack server is compiling and watching for changes...');
 
-console.log(preConfig.client.entry.slice( 0, preConfig.client.entry.lastIndexOf('/')));
-
-compiler.watch({
-  ignored: preConfig.client.entry.slice( 0, preConfig.client.entry.lastIndexOf('/') )
+serverCompiler.watch({
+  // TODO: modify ignored to include all client files, but no server files
+  ignored: fullstackConfig.client.entry.slice( 0, fullstackConfig.client.entry.lastIndexOf('/') )
 }, function startAppServer( err, stats: any ) {
   if (err) {
     console.log('webpack server failed.');
@@ -48,30 +50,34 @@ compiler.watch({
 
   console.log('webpack server compiled succesfully.');
 
-  if (child) {
-    child.kill();
+  if (serverProcess) {
+    serverProcess.kill();
   }
 
-  const serverScriptPath = stats.compilation.assets['server.bundle.js'].existsAt;
-  const serverScript = mfs.readFileSync(serverScriptPath);
-  const vmPath = path.resolve(devDir, 'node_modules/webpack-fullstack/dist/vm.js');
-  const serverEntryPath = path.resolve(devDir, 'src/server.ts');
+  if (dev) {
+    const serverScriptPath = stats.compilation.assets['server.bundle.js'].existsAt;
+    const serverScript = mfs.readFileSync(serverScriptPath);
+    const vmPath = path.resolve(devDir, 'node_modules/webpack-fullstack/dist/vm.js');
+    const serverEntryPath = path.resolve(devDir, 'src/server.ts');
 
-  child = childProcess.spawn('node', [
-    vmPath,
-    serverScript,
-    serverEntryPath
-  ]);
+    serverProcess = childProcess.spawn('node', [
+      vmPath,
+      serverScript,
+      serverEntryPath
+    ]);
 
-  child.stdout.on('data', (data) => {
-    console.log(data.toString());
-  });
+    serverProcess.stdout.on('data', (data) => {
+      console.log(data.toString());
+    });
 
-  child.stderr.on('data', (data) => {
-    console.log(data.toString());
-  });
+    serverProcess.stderr.on('data', (data) => {
+      console.log(data.toString());
+    });
 
-  child.on('exit', (code) => {
-    console.log(`Child exited with code ${code}`);
-  });
+    serverProcess.on('exit', (code) => {
+      console.log(`Child exited with code ${code}`);
+    });
+  } else {
+    process.exit();
+  }
 });

@@ -124,9 +124,10 @@ function processConfig(config, devDir) {
         .filter(function (x) { return ['.bin'].indexOf(x) === -1; })
         .forEach(function (m) { return serverDefaults.externals[m] = 'commonjs ' + m; });
     serverDefaults.externals['react-dom/server'] = 'commonjs react-dom/server';
+    serverDefaults.externals['history/createBrowserHistory'] = 'commonjs history/createBrowserHistory';
     for (var key in config) {
         if (key === 'server') {
-            config.server = __assign({}, serverDefaults, config.server, { devtool: 'inline-source-map' });
+            config.server = __assign({}, serverDefaults, config.server, { devtool: 'source-map' });
         }
         else if (key === 'client') {
             config.client = __assign({}, clientDefaults, config.client);
@@ -169,48 +170,56 @@ var webpack = __webpack_require__(2);
 var MemoryFS = __webpack_require__(5);
 var childProcess = __webpack_require__(4);
 var process_config_1 = __webpack_require__(3);
+var dev = process.argv[2] === '--dev' ? true : false;
 var devDir = path.resolve(process.cwd());
-var preConfigPath = path.join(devDir, 'webpack.fullstack.js');
-var preConfig = require(preConfigPath);
-var config = process_config_1["default"](preConfig, devDir);
-var compiler = webpack(config.server);
+var fullstackConfigPath = path.join(devDir, 'webpack.fullstack.js');
+var fullstackConfig = require(fullstackConfigPath);
+var config = process_config_1["default"](fullstackConfig, devDir);
+var serverCompiler = webpack(config.server);
 var mfs = new MemoryFS();
-compiler.outputFileSystem = mfs;
-fs.writeFile(path.resolve(devDir, 'node_modules/webpack-fullstack/dist/webpack.client.config.js'), "\n    const configAsString = '" + JSON.stringify(config.client, function (key, val) {
+if (dev) {
+    serverCompiler.outputFileSystem = mfs;
+}
+fs.writeFile(path.resolve(devDir, 'node_modules/webpack-fullstack/dist/webpack.client.config.js'), "\n    // encode regex values as strings\n    const configAsString = '" + JSON.stringify(config.client, function (key, val) {
     return val instanceof RegExp ? '_PxEgEr_' + val.toString().slice(2) : val;
-}) + "';\n\n    module.exports = JSON.parse(configAsString, (key, val) =>\n      typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '" + (_a = ["\\"], _a.raw = ["\\\\"], String.raw(_a)) + "' + val.slice(8, -1)) : val);\n  ", function () { return console.log('webpack client config created.'); });
-var child;
+}) + "';\n\n    // decode strings into regex values\n    module.exports = JSON.parse(configAsString, (key, val) =>\n      typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '" + (_a = ["\\"], _a.raw = ["\\\\"], String.raw(_a)) + "' + val.slice(8, -1)) : val);\n  ", function () { return console.log('webpack client config created.'); });
+var serverProcess;
 console.log('webpack server is compiling and watching for changes...');
-console.log(preConfig.client.entry.slice(0, preConfig.client.entry.lastIndexOf('/')));
-compiler.watch({
-    ignored: preConfig.client.entry.slice(0, preConfig.client.entry.lastIndexOf('/'))
+serverCompiler.watch({
+    // TODO: modify ignored to include all client files, but no server files
+    ignored: fullstackConfig.client.entry.slice(0, fullstackConfig.client.entry.lastIndexOf('/'))
 }, function startAppServer(err, stats) {
     if (err) {
         console.log('webpack server failed.');
         return console.log(err);
     }
     console.log('webpack server compiled succesfully.');
-    if (child) {
-        child.kill();
+    if (serverProcess) {
+        serverProcess.kill();
     }
-    var serverScriptPath = stats.compilation.assets['server.bundle.js'].existsAt;
-    var serverScript = mfs.readFileSync(serverScriptPath);
-    var vmPath = path.resolve(devDir, 'node_modules/webpack-fullstack/dist/vm.js');
-    var serverEntryPath = path.resolve(devDir, 'src/server.ts');
-    child = childProcess.spawn('node', [
-        vmPath,
-        serverScript,
-        serverEntryPath
-    ]);
-    child.stdout.on('data', function (data) {
-        console.log(data.toString());
-    });
-    child.stderr.on('data', function (data) {
-        console.log(data.toString());
-    });
-    child.on('exit', function (code) {
-        console.log("Child exited with code " + code);
-    });
+    if (dev) {
+        var serverScriptPath = stats.compilation.assets['server.bundle.js'].existsAt;
+        var serverScript = mfs.readFileSync(serverScriptPath);
+        var vmPath = path.resolve(devDir, 'node_modules/webpack-fullstack/dist/vm.js');
+        var serverEntryPath = path.resolve(devDir, 'src/server.ts');
+        serverProcess = childProcess.spawn('node', [
+            vmPath,
+            serverScript,
+            serverEntryPath
+        ]);
+        serverProcess.stdout.on('data', function (data) {
+            console.log(data.toString());
+        });
+        serverProcess.stderr.on('data', function (data) {
+            console.log(data.toString());
+        });
+        serverProcess.on('exit', function (code) {
+            console.log("Child exited with code " + code);
+        });
+    }
+    else {
+        process.exit();
+    }
 });
 var _a;
 
