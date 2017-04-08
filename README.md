@@ -1,7 +1,7 @@
 # webpack-fullstack
 This package provides a simple CLI that is ideal for building apps that use Webpack to compile both server-side code and client code. There are two primary reasons to use this package, it will allow you to:
 1. automatically start and restart a node child process for your server each time changes are made to the server-side source code (instead of using something like nodemon).
-2. consolidate both Webpack configurations (client and server) into a single file that provides sensible defaults with the ability to provide overrides .
+2. consolidate both Webpack configurations (client and server) into a single file that provides sensible defaults with the ability to provide overrides.
 
 ### quickstart
 1. `npm install webpack-fullstack -g`
@@ -25,5 +25,5 @@ This package provides a simple CLI that is ideal for building apps that use Webp
 ### 3. CLI: webpack-fullstack-dev-server
   // TO-DO
 
-### 4. CLI: webpack-fullstack-dev-server —output-client
-  // TO-DO
+### 4. CLI: webpack-fullstack-dev-server —-output-client
+Using this option will build the client config inside your local node_modules/webpack-fullstack directory. You can import and consume it by `import config from webpack-fullstack`.

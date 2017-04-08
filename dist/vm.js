@@ -65,22 +65,15 @@ require("source-map-support").install();
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 6:
-/***/ (function(module, exports) {
-
-module.exports = require("vm2");
-
-/***/ }),
-
-/***/ 8:
+/***/ 10:
 /***/ (function(module, exports, __webpack_require__) {
 
-const {NodeVM} = __webpack_require__(6);
+const {NodeVM} = __webpack_require__(7);
 
 const vm = new NodeVM({
   require: {
@@ -91,6 +84,13 @@ const vm = new NodeVM({
 
 vm.run(process.argv[2], process.argv[3]);
 
+
+/***/ }),
+
+/***/ 7:
+/***/ (function(module, exports) {
+
+module.exports = require("vm2");
 
 /***/ })
 

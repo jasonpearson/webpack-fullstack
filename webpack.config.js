@@ -10,7 +10,8 @@ fs.readdirSync('node_modules')
 
 module.exports = {
   entry: {
-    'webpack-fullstack': './src/index.ts',
+    'webpack-fullstack': './src/webpack-fullstack.ts',
+    'webpack-fullstack-dev-server': './src/webpack-fullstack-dev-server.ts',
     'vm': './src/vm.js'
   },
 

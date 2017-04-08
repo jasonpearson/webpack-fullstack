@@ -65,7 +65,7 @@ require("source-map-support").install();
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -168,26 +168,72 @@ exports["default"] = processConfig;
 
 
 /***/ }),
-/* 5 */,
-/* 6 */,
+/* 5 */
+/***/ (function(module, exports) {
+
+module.exports = require("child_process");
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+module.exports = require("memory-fs");
+
+/***/ }),
 /* 7 */,
-/* 8 */,
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
+var path = __webpack_require__(0);
+var fs = __webpack_require__(2);
 var webpack = __webpack_require__(1);
+var MemoryFS = __webpack_require__(6);
+var childProcess = __webpack_require__(5);
 var index_1 = __webpack_require__(3);
-webpack([index_1.processedConfig.client, index_1.processedConfig.server], function (err, stats) {
-    if (err || stats.hasErrors()) {
-        console.log(err || stats.hasErrors);
+if (index_1.opts.outputClient) {
+    fs.writeFile(path.resolve(index_1.userDir, 'node_modules/webpack-fullstack/dist/webpack.client.config.js'), "\n      // encode regex values as strings\n      const configAsString = '" + JSON.stringify(index_1.processedConfig.client, function (key, val) {
+        return val instanceof RegExp ? '_PxEgEr_' + val.toString().slice(2) : val;
+    }) + "';\n\n      // decode strings into regex values\n      module.exports = JSON.parse(configAsString, (key, val) =>\n        typeof val === 'string' && val.substring(0, 8) === '_PxEgEr_' ? new RegExp( '" + (_a = ["\\"], _a.raw = ["\\\\"], String.raw(_a)) + "' + val.slice(8, -1)) : val);\n    ", function () { return console.log('webpack client config created.'); });
+}
+var serverCompiler = webpack(index_1.processedConfig.server);
+var mfs = new MemoryFS();
+serverCompiler.outputFileSystem = mfs;
+var serverProcess;
+console.log('webpack server is compiling and watching for changes...');
+serverCompiler.watch({}, function startAppServer(err, stats) {
+    if (err) {
+        console.log('webpack server failed.');
+        return console.log(err);
     }
-    console.log(stats.toString());
+    console.log('webpack server compiled succesfully.');
+    if (serverProcess) {
+        serverProcess.kill();
+    }
+    var serverScriptPath = stats.compilation.assets['server.bundle.js'].existsAt;
+    var serverScript = mfs.readFileSync(serverScriptPath);
+    var vmPath = path.resolve(index_1.userDir, 'node_modules/webpack-fullstack/dist/vm.js');
+    var serverEntryPath = path.resolve(index_1.userDir, 'src/server.ts');
+    serverProcess = childProcess.spawn('node', [
+        vmPath,
+        serverScript,
+        serverEntryPath
+    ]);
+    serverProcess.stdout.on('data', function (data) {
+        console.log(data.toString());
+    });
+    serverProcess.stderr.on('data', function (data) {
+        console.log(data.toString());
+    });
+    serverProcess.on('exit', function (code) {
+        console.log("Child exited with code " + code);
+    });
 });
+var _a;
 
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=webpack-fullstack.js.map
+//# sourceMappingURL=webpack-fullstack-dev-server.js.map
